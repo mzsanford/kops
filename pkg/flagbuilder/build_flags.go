@@ -108,7 +108,12 @@ func BuildFlags(options interface{}) (string, error) {
 
 		case bool, int, int32, int64, float32, float64:
 			vString := fmt.Sprintf("%v", v)
-			if vString != flagEmpty {
+			if vString == flagEmpty {
+				if flagName == "experimental-nvidia-gpus" {
+					// Auto-detect the presence of the nvidia driver
+					flag = fmt.Sprintf("--%s=$(ls -1 /dev/nvidia0 2>/dev/null | wc -l)", flagName)
+				}
+			} else {
 				flag = fmt.Sprintf("--%s=%s", flagName, vString)
 			}
 

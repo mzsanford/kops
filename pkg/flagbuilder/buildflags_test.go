@@ -17,10 +17,11 @@ limitations under the License.
 package flagbuilder
 
 import (
-	"k8s.io/kops/pkg/apis/kops"
-	metav1 "k8s.io/kubernetes/pkg/apis/meta/v1"
 	"testing"
 	"time"
+
+	"k8s.io/kops/pkg/apis/kops"
+	metav1 "k8s.io/kubernetes/pkg/apis/meta/v1"
 )
 
 func TestBuildKCMFlags(t *testing.T) {
@@ -46,11 +47,17 @@ func TestKubeletConfigSpec(t *testing.T) {
 			Config: &kops.KubeletConfigSpec{
 				APIServers: "https://example.com",
 			},
-			Expected: "--api-servers=https://example.com",
+			Expected: "--api-servers=https://example.com --experimental-nvidia-gpus=$(ls -1 /dev/nvidia0 2>/dev/null | wc -l)",
 		},
 		{
 			Config:   &kops.KubeletConfigSpec{},
-			Expected: "",
+			Expected: "--experimental-nvidia-gpus=$(ls -1 /dev/nvidia0 2>/dev/null | wc -l)",
+		},
+		{
+			Config: &kops.KubeletConfigSpec{
+				NvidiaGPUs: 1,
+			},
+			Expected: "--experimental-nvidia-gpus=1",
 		},
 	}
 
